@@ -1,0 +1,13 @@
+# MAL-Projects
+Just some basic python applications I wrote for fun.
+
+Background.py - Generates a Wallpaper from the airing shows on your currently watching shows. Currently no algorithm for number of divisions.
+
+Broken.json - Mal.py uses the tvdb to get show airing info. Some of these shows are broken and this file contains the correct info
+
+idMemoizer.py - Mal's api can be kind of slow some times. This file will take your account and cache the object from all of your shows.
+
+image_stuff.py - Helper file for Background.py
+
+Mal.py - Needs to be renamed. What it currently does is gives you a countdown till all the shows on your currently watching and are airing air for that week.
+

@@ -16,15 +16,17 @@ import pickle
 exitFlag = 0
 t = tvdb_api.Tvdb()
 
+path=os.path.dirname(os.path.abspath(__file__))
+
 memoizedAir = {}
 
-with open("bins/memoizedIDs.bin", "rb") as fp:   # Unpickling
+with open(path+"/bins/memoizedIDs.bin", "rb") as fp:   # Unpickling
     memoizedIDs = pickle.load(fp)
 
-with open('broken.json') as data_file:
+with open(path+'/broken.json') as data_file:
     broken = json.load(data_file)
 
-with open('config.json') as data_file:
+with open(path+'/config.json') as data_file:
     config = json.load(data_file)
 
 weekdayInt = {"Monday":0,"Tuesday":1,"Wednesday":2,"Thursday":3,"Friday":4,"Saturday":5,"Sunday":6}

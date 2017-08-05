@@ -12,6 +12,8 @@ import requests
 from collections import defaultdict
 from image_stuff import *
 
+path=os.path.dirname(os.path.abspath(__file__))
+
 sys.setrecursionlimit(10000)
 
 def get_input(string):
@@ -27,19 +29,19 @@ def is_url_image(url):
 
 t = tvdb_api.Tvdb()
 
-with open('config.json') as data_file:
+with open(path+'/config.json') as data_file:
     config = json.load(data_file)
 
 creds = spice.init_auth(config["UserName"],config["Password"])
 
 
-with open("bins/memoizedIDs.bin", "rb") as fp:   # Unpickling
+with open(path+"/bins/memoizedIDs.bin", "rb") as fp:   # Unpickling
     memoizedIDs = pickle.load(fp)
 
-with open("bins/memoizedAir.bin", "rb") as fp:   # Unpickling
+with open(path+"/bins/memoizedAir.bin", "rb") as fp:   # Unpickling
     memoizedAir = pickle.load(fp)
 
-with open('broken.json') as data_file:
+with open(path+'/broken.json') as data_file:
     broken = json.load(data_file)
 
 weekdayInt = {"Monday":0,"Tuesday":1,"Wednesday":2,"Thursday":3,"Friday":4,"Saturday":5,"Sunday":6}
@@ -107,7 +109,7 @@ def download_images(list):
             pic_type= (show[2].split("."))[len((show[2].split(".")))-1]
             name += "."+ pic_type
 
-            file_path = "/users/jacob/gitRepos/MAL/covers/"+name
+            file_path = path+"/covers/"+name
             file_path = file_path.replace(":","")
             directory = os.path.dirname(file_path)
             if not os.path.exists(directory):
@@ -144,8 +146,7 @@ for thread1 in threads:
     if(thread1.info != None):
         Show_List.append(thread1.info)
 
-with open("bins/memoizedAir.bin", "wb") as fp:   #Pickling
-    pickle.dump(memoizedAir, fp)
+
 
 
 Show_List.sort(key=lambda tup: tup[1])
@@ -172,7 +173,7 @@ for date, shows in reversed(list(show_by_day.items())):
 
 GAP_horizontal = 10
 GAP_vertical = 15
-screensize = (1440, 2560)
+screensize = (1680, 1050)
 showcover_resize = (225, 332) # Set to None to disable resizing, set to (width, height) to resize all covers to that size
 numberOfRowsThresholds = [(0, 1), (5, 2), (9, 3)] # Tuples of (threshold-number-of-shows, corresponding-number-of-generated-rows)
 
@@ -208,7 +209,7 @@ if overflowitem is not None:
 rows = []
 if len(renderitems) > 0:
     numberOfRowsThresholds.sort(key=lambda pair: pair[0])
-    divisions = 5#list(filter((lambda pair: len(reduce(lambda x,y: x+y, show_by_day.values())) >= pair[0]), numberOfRowsThresholds))[-1][1]
+    divisions = 3#list(filter((lambda pair: len(reduce(lambda x,y: x+y, show_by_day.values())) >= pair[0]), numberOfRowsThresholds))[-1][1]
 
     totalwidth = itemswidth(renderitems,GAP_horizontal)
 
@@ -257,7 +258,7 @@ for row in rows:
 
 # render
 image = Image.new("RGB",screensize)
-background= Image.open("covers/base.png")
+background= Image.open(path+"/covers/base.png")
 background= background.resize(screensize)
 image.paste(background,(0,0))
 
@@ -270,4 +271,4 @@ for row in rows:
         x += item.getWidth() + GAP_horizontal
     y += rowheight + GAP_vertical
 
-image.save("Final.jpg")
+image.save(path+"/Final.jpg")

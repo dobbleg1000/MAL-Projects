@@ -2,7 +2,6 @@ import spice_api as spice
 import tvdb_api
 import re
 import os
-import threading
 import time
 import tvdb_api
 from datetime import datetime
@@ -12,22 +11,33 @@ import pytz
 import tkinter as tk
 import json
 import pickle
+import Agents
 
 exitFlag = 0
+
 t = tvdb_api.Tvdb()
+
+animeList=[]
 
 memoizedAir = {}
 
-with open("bins/memoizedIDs.bin", "rb") as fp:   # Unpickling
+path=os.path.dirname(os.path.abspath(__file__))
+
+with open(path+"/bins/memoizedIDs.bin", "rb") as fp:   # Unpickling
     memoizedIDs = pickle.load(fp)
 
-with open('broken.json') as data_file:
+
+with open(path+'/broken.json') as data_file:
     broken = json.load(data_file)
 
-with open('config.json') as data_file:
+
+with open(path+'/config.json') as data_file:
     config = json.load(data_file)
 
+creds = spice.init_auth(config["UserName"],config["Password"])
+
 weekdayInt = {"Monday":0,"Tuesday":1,"Wednesday":2,"Thursday":3,"Friday":4,"Saturday":5,"Sunday":6}
+
 def adjustDate(weekday,timeOfDay):
 
     def toMilitaryTime(splitTime):
@@ -68,21 +78,9 @@ def adjustDate(weekday,timeOfDay):
 
     return str(t)
 
-class myThread (threading.Thread):
-   def __init__(self, threadID, name, showId,creds):
-      threading.Thread.__init__(self)
-      self.threadID = threadID
-      self.name = name
-      self.showId = showId
-      self.credential = creds
-      self.info = ""
-   def run(self):
-      #print ("Starting " + self.name)
-      self.info = scrapeInfo(self.name, self.showId,self.credential)
-      #print ("Exiting " + self.name)
 
-def scrapeInfo(threadName,showId,creds):
-    #print(creds)
+def scrapeInfo(showId,creds):
+
     if(showId in memoizedIDs):
         nameInfo = memoizedIDs[showId]
     else:
@@ -104,20 +102,16 @@ def scrapeInfo(threadName,showId,creds):
             airTime = t[name]['airs_time']
             memoizedAir[name] = [airDay , airTime]
         tillAir=adjustDate(airDay,airTime)
-        return (name,adjustDate(airDay,airTime),airDay)
+        animeList.append((name,tillAir,airDay))
 
 
-
-creds = spice.init_auth(config["UserName"],config["Password"])
-
-
-class SampleApp(tk.Tk):
+class mal_app(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.list = tk.Label(self, text="",fg="white",bg="black")
         self.list.pack()
         self.label =""
-
+        self.agent = Agents.Agent(method=scrapeInfo,n_threads=1)
 
         self.update_label()
 
@@ -125,22 +119,13 @@ class SampleApp(tk.Tk):
     def update_label(self):
         your_list = spice.get_list(spice.get_medium('anime'),creds[0] ,creds)
         ids=your_list.get_status(1)
-        animeList=[]
+        animeList.clear()
         threads=[]
         count = 1
         for id in ids:
-            threads.append(myThread(count, "Thread-"+str(id),id,creds))
-            count+=1
+            self.agent.execute_async(id,creds)
 
-        for thread1 in threads:
-            thread1.start()
-
-        for thread1 in threads:
-            thread1.join()
-            if(thread1.info != None):
-                if thread1.info != '':
-                    animeList.append(thread1.info)
-
+        self.agent.finalize()
 
         animeList.sort(key=lambda tup: tup[0])
 
@@ -153,16 +138,17 @@ class SampleApp(tk.Tk):
             except:
                 pass
         self.list.configure(text=self.label)
-        self.after(10000, self.update_label)
+        self.agent = Agents.Agent(method=scrapeInfo,n_threads=1)
+        self.after(1000, self.update_label)
 
 
+app = mal_app()
 
 
-app = SampleApp()
 if __name__ == "__main__":
     app.title("Show CountDown")
     app.configure(background="black")
 
     app.mainloop()
-
+    app.agent.finalize()
     print("after APP")

@@ -1,7 +1,10 @@
 import abc
 from PIL import Image
 from functools import *
+import os
 
+path=os.path.dirname(os.path.abspath(__file__))
+path=path.replace("\\","/")
 class RenderItem:
     @abc.abstractmethod
     def getWidth(self):
@@ -25,7 +28,7 @@ def itemsheight(items):
 
 class Picture(RenderItem):
     def __init__(self, image):
-        self.image = Image.open("covers/"+image)
+        self.image = Image.open(path+"/covers/"+image)
 
     def getWidth(self):
         return self.image.width

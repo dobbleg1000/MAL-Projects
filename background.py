@@ -12,6 +12,8 @@ import requests
 from collections import defaultdict
 from image_stuff import *
 
+path=os.path.dirname(os.path.abspath(__file__))
+
 sys.setrecursionlimit(10000)
 
 def get_input(string):
@@ -177,7 +179,7 @@ for date, shows in reversed(list(show_by_day.items())):
 
 GAP_horizontal = 10
 GAP_vertical = 15
-screensize = (1440, 2560)
+screensize = (1680, 1050)
 showcover_resize = (225, 332) # Set to None to disable resizing, set to (width, height) to resize all covers to that size
 numberOfRowsThresholds = [(0, 1), (5, 2), (9, 3)] # Tuples of (threshold-number-of-shows, corresponding-number-of-generated-rows)
 

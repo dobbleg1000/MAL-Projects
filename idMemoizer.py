@@ -2,8 +2,11 @@ import pickle
 import spice_api as spice
 import sys
 import json
+import os
 
-with open('config.json') as data_file:
+path=os.path.dirname(os.path.abspath(__file__))
+
+with open(path+'/config.json') as data_file:
     config = json.load(data_file)
 
 creds = spice.init_auth(config["UserName"],config["Password"])
@@ -19,5 +22,5 @@ for id in ids:
         nameInfo = spice.search_id(id,spice.get_medium('anime'),creds)
         memoizedIDs[id] = nameInfo
 
-with open("bins/memoizedIDs.bin", "wb") as fp:   #Pickling
+with open(path+"/bins/memoizedIDs.bin", "wb") as fp:   #Pickling
     pickle.dump(memoizedIDs, fp)

@@ -12,6 +12,10 @@ import requests
 from collections import defaultdict
 from image_stuff import *
 
+
+current = not ("--old" in sys.argv)
+
+
 path=os.path.dirname(os.path.abspath(__file__))
 
 sys.setrecursionlimit(10000)
@@ -89,7 +93,7 @@ def scrapeInfo(threadName,showId,creds):
 		nameInfo = spice.search_id(showId,spice.get_medium('anime'),creds)
 
 
-	if ('Currently Airing' == nameInfo.status):
+	if ('Currently Airing' == nameInfo.status and current):
 		name=re.sub(r'\([^)]*\)', '', nameInfo.title)
 
 		if(name in broken):
@@ -104,6 +108,10 @@ def scrapeInfo(threadName,showId,creds):
 			memoizedAir[name] = airDay
 
 		return (airDay,name,nameInfo.image_url)
+	elif('Currently Airing' != nameInfo.status and not current):
+		name=re.sub(r'\([^)]*\)', '', nameInfo.title)
+		airDay = "Monday"
+		return (airDay,name,nameInfo.image_url)
 
 def download_images(list):
 	for show in list: #Save the Images
@@ -112,6 +120,7 @@ def download_images(list):
 			pic_type= (show[2].split("."))[len((show[2].split(".")))-1]
 			name += "."+ pic_type
 			name = name.replace(":","")
+			name = name.replace("?","")
 			file_path = path+"/covers/"+name
 
 			file_path = file_path.replace("\\","/")
@@ -164,6 +173,7 @@ show_by_day = {"Monday": [], "Tuesday": [], "Wednesday": [], "Thursday": [], "Fr
 for show in Show_List:
 	fileName = show[1]+".jpg"
 	fileName = fileName.replace(":","")
+	fileName = fileName.replace("?","")
 	show_by_day[show[0]].append(fileName)
 
 
@@ -179,7 +189,7 @@ for date, shows in reversed(list(show_by_day.items())):
 
 GAP_horizontal = 10
 GAP_vertical = 15
-screensize = (1680, 1050)
+screensize = (1920, 1080)
 showcover_resize = (225, 332) # Set to None to disable resizing, set to (width, height) to resize all covers to that size
 numberOfRowsThresholds = [(0, 1), (5, 2), (9, 3)] # Tuples of (threshold-number-of-shows, corresponding-number-of-generated-rows)
 
@@ -201,8 +211,11 @@ for date, shows in show_by_day.items():
 	if len(shows) == 0:
 		overflowitem = prependoverflow(daylabel)
 	else:
-		renderitems.append(prependoverflow(Bind(daylabel, getshowcover(shows[0]), GAP_horizontal)))
-		renderitems += map(getshowcover, shows[1:])
+		if(current):
+			renderitems.append(prependoverflow(Bind(daylabel, getshowcover(shows[0]), GAP_horizontal)))
+			renderitems += map(getshowcover, shows[1:])
+		else:
+			renderitems += map(getshowcover, shows)
 
 if overflowitem is not None:
 	if len(renderitems) > 0:
@@ -215,7 +228,7 @@ if overflowitem is not None:
 rows = []
 if len(renderitems) > 0:
 	numberOfRowsThresholds.sort(key=lambda pair: pair[0])
-	divisions = 5#list(filter((lambda pair: len(reduce(lambda x,y: x+y, show_by_day.values())) >= pair[0]), numberOfRowsThresholds))[-1][1]
+	divisions = 3#list(filter((lambda pair: len(reduce(lambda x,y: x+y, show_by_day.values())) >= pair[0]), numberOfRowsThresholds))[-1][1]
 
 	totalwidth = itemswidth(renderitems,GAP_horizontal)
 
@@ -277,4 +290,7 @@ for row in rows:
 		x += item.getWidth() + GAP_horizontal
 	y += rowheight + GAP_vertical
 
-image.save(path+"/Final.jpg")
+if(current):
+	image.save(path+"/CurrentlyAiring.jpg")
+else:
+	image.save(path+"/Watching.jpg")

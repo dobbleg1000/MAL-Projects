@@ -1,7 +1,7 @@
 # MAL-Projects
 Just some basic python applications I wrote for fun.
 
-Background.py - Generates a Wallpaper from the airing shows on your currently watching shows. Currently no algorithm for number of divisions.
+Background.py - Generates a Wallpaper from the airing shows on your currently watching shows. Currently no algorithm for number of divisions. --username to give username or answer the prompt. If the prompt is blank it defaults to config username
 
 Broken.json - Mal.py uses the tvdb to get show airing info. Some of these shows are broken and this file contains the correct info
 

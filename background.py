@@ -12,26 +12,12 @@ import requests
 from collections import defaultdict
 from image_stuff import *
 
-
-current = not ("--old" in sys.argv)
-
-
-path=os.path.dirname(os.path.abspath(__file__))
-
-sys.setrecursionlimit(10000)
-
 def get_input(string):
 	''' Get input from console regardless of python 2 or 3 '''
 	try:
 		return raw_input(string)
 	except:
 		return input(string)
-
-def is_url_image(url):
-	mimetype,encoding = mimetypes.guess_type(url)
-	return (mimetype and mimetype.startswith('image'))
-
-t = tvdb_api.Tvdb()
 
 path=os.path.dirname(os.path.abspath(__file__))
 
@@ -47,6 +33,31 @@ with open(path+'/broken.json') as data_file:
 
 with open(path+'/config.json') as data_file:
 	config = json.load(data_file)
+
+
+current = not ("--old" in sys.argv)
+
+if("--username" in sys.argv):
+	username= sys.argv[sys.argv.index("--username")+1]
+else:
+	username=get_input("Mal Username:["+config["UserName"]+"]\n")
+
+if username == "":
+	username = config["UserName"]
+
+
+
+path=os.path.dirname(os.path.abspath(__file__))
+
+sys.setrecursionlimit(10000)
+
+
+def is_url_image(url):
+	mimetype,encoding = mimetypes.guess_type(url)
+	return (mimetype and mimetype.startswith('image'))
+
+t = tvdb_api.Tvdb()
+
 
 creds = spice.init_auth(config["UserName"],config["Password"])
 
@@ -143,7 +154,7 @@ def download_images(list):
 				print('\nContinuing...')
 				continue
 
-your_list = spice.get_list(spice.get_medium('anime'),"Dobbleg1000" ,creds)
+your_list = spice.get_list(spice.get_medium('anime'), username,creds)
 ids=your_list.get_status(1)
 threads=[]
 Show_List = []
@@ -228,7 +239,7 @@ if overflowitem is not None:
 rows = []
 if len(renderitems) > 0:
 	numberOfRowsThresholds.sort(key=lambda pair: pair[0])
-	divisions = 3#list(filter((lambda pair: len(reduce(lambda x,y: x+y, show_by_day.values())) >= pair[0]), numberOfRowsThresholds))[-1][1]
+	divisions = list(filter((lambda pair: len(reduce(lambda x,y: x+y, show_by_day.values())) >= pair[0]), numberOfRowsThresholds))[-1][1]
 
 	totalwidth = itemswidth(renderitems,GAP_horizontal)
 

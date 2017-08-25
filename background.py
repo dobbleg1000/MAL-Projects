@@ -45,7 +45,10 @@ else:
 if username == "":
 	username = config["UserName"]
 
+size = get_input("Enter the screens widthxheight (ex. 1920x1080):\n")
 
+size = size.split("x")
+screensize = (int(size[0]),int(size[1]))
 
 path=os.path.dirname(os.path.abspath(__file__))
 
@@ -200,7 +203,7 @@ for date, shows in reversed(list(show_by_day.items())):
 
 GAP_horizontal = 10
 GAP_vertical = 15
-screensize = (1920, 1080)
+
 showcover_resize = (225, 332) # Set to None to disable resizing, set to (width, height) to resize all covers to that size
 numberOfRowsThresholds = [(0, 1), (5, 2), (9, 3)] # Tuples of (threshold-number-of-shows, corresponding-number-of-generated-rows)
 

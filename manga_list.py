@@ -50,11 +50,11 @@ if __name__ == "__main__":
     final=""
     for key in mangaList.keys():
         mangaList[key].sort()
-        mangaList[key]=["\n"+key] + mangaList[key]
+        mangaList[key]=["\n\n"+key+"\n"] + mangaList[key]
         final+="\n".join(mangaList[key])
 
 
 
 
     thefile = open('mangaList.txt', 'w',encoding="utf8")
-    thefile.write(final[0:])
+    thefile.write(final[2:])

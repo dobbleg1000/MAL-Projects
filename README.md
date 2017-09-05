@@ -15,6 +15,10 @@ covers\ - location of the pictures needed by Background.py and where it will sav
 
 bins\ - location for the caches and a template label for the days of the week.
 
+manga_list.py - creates a mangaList.txt which is your Manga list seperated by type.
+
+cur_no_air.py - creates a list of your watching anime without the currently airing show
+
 # Config
 In order for you to use any of these files you must create a config.json with this info inside
 

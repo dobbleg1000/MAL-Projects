@@ -2,15 +2,14 @@ import spice_api as spice
 
 import re
 import os
-
-
+from collections import defaultdict
 import json
 import Agents
 
 import functools
 
 path=os.path.dirname(os.path.abspath(__file__))
-animeList=[]
+animeList=defaultdict(list)
 
 with open(path+'/config.json') as data_file:
     config = json.load(data_file)
@@ -35,25 +34,26 @@ def scrapeInfo(showId,creds):
 
     if ('Currently Airing' != nameInfo.status):
         name=re.sub(r'\([^)]*\)', '', nameInfo.title)
-        animeList.append(name)
+        animeList[nameInfo.anime_type].append(nameInfo.title)
 
 if __name__ == "__main__":
     agent = Agents.Agent(method=scrapeInfo,n_threads=20)
     your_list = spice.get_list(spice.get_medium('anime'),creds[0] ,creds)
     ids=your_list.get_status(1)
     animeList.clear()
-    
+
     count = 1
     for id in ids:
         agent.execute_async(id,creds)
 
     agent.finalize()
-    animeList.sort()
 
 
-    label =""
-    for show in animeList:
-        label+=show+'\n'
-    print(label)
-    thefile = open('animeList.txt', 'w')
-    thefile.write("\n".join(animeList))
+    final=""
+    for key in animeList.keys():
+        animeList[key].sort()
+        final+="\n\n"+key+"\n"+"\n".join(animeList[key])
+
+
+    thefile = open(path+'/animeList.txt', 'w')
+    thefile.write(final[2:])

@@ -61,5 +61,5 @@ if __name__ == "__main__":
 
 
 
-    thefile = open('mangaList.txt', 'w',encoding="utf8")
+    thefile = open(path+'/mangaList.txt', 'w',encoding="utf8")
     thefile.write(final[2:])

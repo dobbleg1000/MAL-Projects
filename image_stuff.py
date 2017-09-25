@@ -1,10 +1,12 @@
 import abc
 from PIL import Image
-from functools import *
+import functools
 import os
 
-path=os.path.dirname(os.path.abspath(__file__))
-path=path.replace("\\","/")
+path = os.path.dirname(os.path.abspath(__file__))
+path = path.replace("\\", "/")
+
+
 class RenderItem:
     @abc.abstractmethod
     def getWidth(self):
@@ -18,17 +20,21 @@ class RenderItem:
     def render(self, image, position):
         pass
 
-def itemswidth(items,GAP_horizontal):
-    return reduce(lambda x,y: x + GAP_horizontal + y,
-            map(lambda renderitem: renderitem.getWidth(),
-                items))
+
+def itemswidth(items, GAP_horizontal):
+    return functools.reduce(lambda x, y: x + GAP_horizontal + y,
+                            map(lambda renderitem: renderitem.getWidth(),
+                                items))
+
 
 def itemsheight(items):
-    return reduce(max, map(lambda renderitem: renderitem.getHeight(), items))
+    return functools.reduce(max, map(lambda renderitem: renderitem.getHeight(),
+                            items))
+
 
 class Picture(RenderItem):
     def __init__(self, image):
-        self.image = Image.open(path+"/covers/"+image)
+        self.image = Image.open(path + "/covers/" + image)
 
     def getWidth(self):
         return self.image.width
@@ -39,14 +45,16 @@ class Picture(RenderItem):
     def render(self, image, position):
         image.paste(self.image, position)
 
+
 class ResizePicture(Picture):
-	def __init__(self, image, newsize):
-		Picture.__init__(self, image)
-		self.image = self.image.resize(newsize)
+    def __init__(self, image, newsize):
+        Picture.__init__(self, image)
+        self.image = self.image.resize(newsize)
+
 
 class Label(Picture):
-	def __init__(self, image):
-		Picture.__init__(self, image)
+    def __init__(self, image):
+        Picture.__init__(self, image)
 
 
 class Bind(RenderItem):
@@ -63,11 +71,11 @@ class Bind(RenderItem):
 
     def render(self, image, position):
         self.first.render(image,
-            (position[0],
-                position[1] + int((self.getHeight() - self.first.getHeight()) / 2)))
+                          (position[0],
+                           position[1] + int((self.getHeight() - self.first.getHeight()) / 2)))
         self.second.render(image,
-            (position[0] + self.first.getWidth() + self.gap,
-                position[1] + int((self.getHeight() - self.second.getHeight()) / 2)))
+                           (position[0] + self.first.getWidth() + self.gap,
+                            position[1] + int((self.getHeight() - self.second.getHeight()) / 2)))
 
     def recFirst(self):
         if type(self.first) is Bind:

@@ -105,7 +105,7 @@ def scrapeInfo(threadName, showId, creds):
         nameInfo = memoizedIDs[showId]
     else:
         nameInfo = spice.search_id(showId, spice.get_medium('anime'), creds)
-
+        print(nameInfo.title + " " + nameInfo.status)
     if ('Currently Airing' == nameInfo.status and current):
         name = re.sub(r'\([^)]*\)', '', nameInfo.title)
 
@@ -115,10 +115,14 @@ def scrapeInfo(threadName, showId, creds):
         elif(name in memoizedAir):
             airDay = memoizedAir[name]
         else:
-            airDay = t[name]['airs_dayofweek']
-            timeOfDay = t[name]['airs_time']
-            airDay = timeAdjust(timeOfDay, airDay)
-            memoizedAir[name] = airDay
+            try:
+                airDay = t[name]['airs_dayofweek']
+                timeOfDay = t[name]['airs_time']
+
+                airDay = timeAdjust(timeOfDay, airDay)
+                memoizedAir[name] = airDay
+            except Exception:
+                print(name)
 
         return (airDay, name, nameInfo.image_url)
     elif('Currently Airing' != nameInfo.status and not current):

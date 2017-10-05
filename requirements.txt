@@ -1,5 +1,7 @@
-spice_api==1.0.4
-requests==2.12.4
 pytz==2017.2
-Pillow==4.2.1
-tvdb_api==1.10
+tvdb_api==2.0
+lagents==0.1.0
+spice_api==1.0.4
+requests==2.18.4
+Pillow==4.3.0
+progressbar2==3.34.3

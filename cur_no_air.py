@@ -2,7 +2,7 @@ import spice_api as spice
 import os
 from collections import defaultdict
 import json
-import Agents
+import lagents
 
 import functools
 
@@ -37,7 +37,7 @@ def scrapeInfo(showId, creds):
 
 
 if __name__ == "__main__":
-    agent = Agents.Agent(method=scrapeInfo, n_threads=20)
+    agent = lagents.Agent(method=scrapeInfo, max_workers=20)
     your_list = spice.get_list(spice.get_medium('anime'), creds[0], creds)
     ids = your_list.get_status(1)
     animeList.clear()
@@ -46,8 +46,8 @@ if __name__ == "__main__":
     for id in ids:
         agent.execute_async(id, creds)
 
+    agent.join()
     agent.finalize()
-
     final = ""
     for key in animeList.keys():
         animeList[key].sort()

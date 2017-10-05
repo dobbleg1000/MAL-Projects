@@ -8,7 +8,7 @@ import pytz
 import tkinter as tk
 import json
 import pickle
-import Agents
+import lagents
 
 exitFlag = 0
 
@@ -93,8 +93,8 @@ def scrapeInfo(showId, creds):
             airDay = memoizedAir[name][0]
             airTime = memoizedAir[name][1]
         else:
-            airDay = t[name]['airs_dayofweek']
-            airTime = t[name]['airs_time']
+            airDay = t[name]['airsDayOfWeek']
+            airTime = t[name]['airsTime']
             memoizedAir[name] = [airDay, airTime]
         tillAir = adjustDate(airDay, airTime)
         animeList.append((name, tillAir, airDay))
@@ -106,7 +106,7 @@ class mal_app(tk.Tk):
         self.list = tk.Label(self, text="", fg="white", bg="black")
         self.list.pack()
         self.label = ""
-        self.agent = Agents.Agent(method=scrapeInfo, n_threads=1)
+        self.agent = lagents.Agent(method=scrapeInfo)
 
         self.update_label()
 
@@ -117,7 +117,7 @@ class mal_app(tk.Tk):
         for id in ids:
             self.agent.execute_async(id, creds)
 
-        self.agent.finalize()
+        self.agent.join()
 
         animeList.sort(key=lambda tup: tup[0])
 
@@ -126,10 +126,9 @@ class mal_app(tk.Tk):
             try:
                 self.label += show[0] + '\n'
                 self.label += show[1] + '\n\n'
-            except:
+            except Exception:
                 pass
         self.list.configure(text=self.label)
-        self.agent = Agents.Agent(method=scrapeInfo, n_threads=1)
         self.after(1000, self.update_label)
 
 

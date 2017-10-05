@@ -2,7 +2,6 @@ from PIL import Image
 import spice_api as spice
 import tvdb_api
 import re
-import threading
 import json
 import pickle
 import mimetypes
@@ -11,6 +10,7 @@ import os
 import requests
 import image_stuff
 import functools
+import lagents
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -27,6 +27,7 @@ with open(path + '/broken.json') as data_file:
 with open(path + '/config.json') as data_file:
     config = json.load(data_file)
 
+Show_List = []
 
 current = not ("--old" in sys.argv)
 
@@ -79,20 +80,7 @@ def toMilitaryTime(splitTime):
             splitTime[0] = str(temp)
 
 
-class myThread (threading.Thread):
-    def __init__(self, threadID, name, showId, creds):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.showId = showId
-        self.credential = creds
-        self.info = ""
-
-    def run(self):
-        self.info = scrapeInfo(self.name, self.showId, self.credential)
-
-
-def scrapeInfo(threadName, showId, creds):
+def scrapeInfo(showId, creds):
     def timeAdjust(time, airDay):
         splitTime = time.split(":")
         toMilitaryTime(splitTime)
@@ -116,19 +104,19 @@ def scrapeInfo(threadName, showId, creds):
             airDay = memoizedAir[name]
         else:
             try:
-                airDay = t[name]['airs_dayofweek']
-                timeOfDay = t[name]['airs_time']
+                airDay = t[name]['airsDayOfWeek']
+                timeOfDay = t[name]['airsTime']
 
                 airDay = timeAdjust(timeOfDay, airDay)
                 memoizedAir[name] = airDay
             except Exception:
                 print(name)
 
-        return (airDay, name, nameInfo.image_url)
+        Show_List.append((airDay, name, nameInfo.image_url))
     elif('Currently Airing' != nameInfo.status and not current):
         name = re.sub(r'\([^)]*\)', '', nameInfo.title)
         airDay = "Monday"
-        return (airDay, name, nameInfo.image_url)
+        Show_List.append((airDay, name, nameInfo.image_url))
 
 
 def download_images(list):
@@ -154,7 +142,7 @@ def download_images(list):
                         if not block:
                             break
                         img.write(block)
-            except:
+            except Exception:
                 sys.stdout.write('\rFailed to save: %s               ' % image)
                 sys.stdout.flush()
                 print('\nContinuing...')
@@ -163,20 +151,15 @@ def download_images(list):
 
 your_list = spice.get_list(spice.get_medium('anime'), username, creds)
 ids = your_list.get_status(1)
-threads = []
-Show_List = []
-count = 1
+agent = lagents.Agent(method=scrapeInfo, max_workers=20)
+
+
 for id in ids:
-    threads.append(myThread(count, "Thread-" + str(id), id, creds))
-    count += 1
+    agent.execute_async(id, creds)
 
-for thread1 in threads:
-    thread1.start()
 
-for thread1 in threads:
-    thread1.join()
-    if(thread1.info is not None):
-        Show_List.append(thread1.info)
+agent.join()
+agent.finalize()
 
 with open(path + "/bins/memoizedAir.bin", "wb") as fp:   # Pickling
     pickle.dump(memoizedAir, fp)

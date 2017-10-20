@@ -1,7 +1,7 @@
 {
-    "Boku no Hero Academia 2nd Season": [
-        "Saturday",
-        "6:30 PM"
+    "Net-juu no Susume": [
+        "Friday",
+        "10:00 PM"
     ],
     "Konohana Kitan": [
         "Wednesday",
@@ -10,7 +10,15 @@
     "Shokugeki no Souma: San no Sara": [
         "Wednesday",
         "00:30"
-    ]
+    ],
+	   "Mahoujin Guruguru ": [
+        "Wednesday",
+        "01:35"
+    ],
+    "3-gatsu no Lion 2nd Season": [
+       "Saturday",
+       "23:00"
+   ]
 
 
 }

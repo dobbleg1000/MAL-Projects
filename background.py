@@ -191,7 +191,8 @@ GAP_vertical = 15
 
 showcover_resize = (225, 332)  # Set to None to disable resizing, set to (width, height) to resize all covers to that size
 numberOfRowsThresholds = [(0, 1), (5, 2), (9, 3)]  # Tuples of (threshold-number-of-shows, corresponding-number-of-generated-rows)
-
+if(screensize[0] < screensize[1]):
+    numberOfRowsThresholds = [(0, 1), (5, 4), (9, 6)]
 # create image_stuff.Label-picture image_stuff.Bindings
 renderitems = []
 overflowitem = None

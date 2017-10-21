@@ -11,6 +11,7 @@ import requests
 import image_stuff
 import functools
 import lagents
+import string
 
 path = os.path.dirname(os.path.abspath(__file__))
 
@@ -106,7 +107,6 @@ def scrapeInfo(showId, creds):
             try:
                 airDay = t[name]['airsDayOfWeek']
                 timeOfDay = t[name]['airsTime']
-
                 airDay = timeAdjust(timeOfDay, airDay)
                 memoizedAir[name] = airDay
             except Exception:
@@ -119,14 +119,17 @@ def scrapeInfo(showId, creds):
         Show_List.append((airDay, name, nameInfo.image_url))
 
 
+valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+valid_chars = frozenset(valid_chars)
+
+
 def download_images(list):
     for show in list:  # Save the Images
         if is_url_image(show[2]):
             name = show[1]
             pic_type = (show[2].split("."))[len((show[2].split("."))) - 1]
+            name = ''.join(c for c in name if c in valid_chars)
             name += "." + pic_type
-            name = name.replace(":", "")
-            name = name.replace("?", "")
             file_path = path + "/covers/" + name
 
             file_path = file_path.replace("\\", "/")
@@ -174,8 +177,7 @@ show_by_day = {"Monday": [], "Tuesday": [], "Wednesday": [], "Thursday": [],
                "Friday": [], "Saturday": [], "Sunday": []}
 for show in Show_List:
     fileName = show[1] + ".jpg"
-    fileName = fileName.replace(":", "")
-    fileName = fileName.replace("?", "")
+    fileName = ''.join(c for c in fileName if c in valid_chars)
     show_by_day[show[0]].append(fileName)
 
 # remove trailing empty image_stuff.Labels
@@ -190,51 +192,93 @@ GAP_horizontal = 10
 GAP_vertical = 15
 
 showcover_resize = (225, 332)  # Set to None to disable resizing, set to (width, height) to resize all covers to that size
-numberOfRowsThresholds = [(0, 1), (5, 2), (9, 3)]  # Tuples of (threshold-number-of-shows, corresponding-number-of-generated-rows)
+numberOfRowsThresholds = [(0, 1), (5, 2), (9, 3),(22, 4)]  # Tuples of (threshold-number-of-shows, corresponding-number-of-generated-rows)
 if(screensize[0] < screensize[1]):
     numberOfRowsThresholds = [(0, 1), (5, 4), (9, 6)]
 # create image_stuff.Label-picture image_stuff.Bindings
-renderitems = []
+
 overflowitem = None
-getshowcover = (lambda image: image_stuff.ResizePicture(image, showcover_resize)) if showcover_resize else (lambda image: image_stuff.Picture(image))
-for date, shows in show_by_day.items():
-    dayLabel = image_stuff.Label(date + ".png")
 
-    def prependoverflow(nextitem):
-        global overflowitem
-        if overflowitem is None:
-            return nextitem
+
+def buildRenderItems(showcover_resize_var):
+    renderitems = []
+    global overflowitem
+    getshowcover = (lambda image: image_stuff.ResizePicture(image, showcover_resize_var)) if showcover_resize_var else (lambda image: image_stuff.Picture(image))
+    for date, shows in show_by_day.items():
+        dayLabel = image_stuff.Label(date + ".png")
+
+        def prependoverflow(nextitem):
+            global overflowitem
+            if overflowitem is None:
+                return nextitem
+            else:
+                r = image_stuff.Bind(overflowitem, nextitem, GAP_horizontal)
+                overflowitem = None
+                return r
+
+        if len(shows) == 0:
+            overflowitem = prependoverflow(dayLabel)
         else:
-            r = image_stuff.Bind(overflowitem, nextitem, GAP_horizontal)
-            overflowitem = None
-            return r
+            if(current):
+                renderitems.append(prependoverflow(image_stuff.Bind(dayLabel, getshowcover(shows[0]), GAP_horizontal)))
+                renderitems += map(getshowcover, shows[1:])
+            else:
+                renderitems += map(getshowcover, shows)
 
-    if len(shows) == 0:
-        overflowitem = prependoverflow(dayLabel)
-    else:
-        if(current):
-            renderitems.append(prependoverflow(image_stuff.Bind(dayLabel, getshowcover(shows[0]), GAP_horizontal)))
-            renderitems += map(getshowcover, shows[1:])
+    if overflowitem is not None:
+        if len(renderitems) > 0:
+            renderitems[-1] = image_stuff.Bind(renderitems[-1], overflowitem, GAP_horizontal)
         else:
-            renderitems += map(getshowcover, shows)
-
-if overflowitem is not None:
-    if len(renderitems) > 0:
-        renderitems[-1] = image_stuff.Bind(renderitems[-1], overflowitem, GAP_horizontal)
-    else:
-        renderitems = [overflowitem]
+            renderitems = [overflowitem]
+    return renderitems
 
 
+def findSizeandBuildRender():
+    divisions = list(filter((lambda pair: len(functools.reduce(lambda x, y: x + y, show_by_day.values())) >= pair[0]), numberOfRowsThresholds))[-1][1]
+    global showcover_resize
+    global screensize
+    showcover_resize_float=showcover_resize
+    renderitems = buildRenderItems(showcover_resize)
+    totalwidth = image_stuff.itemswidth(renderitems, GAP_horizontal)
+    remainingwidth = int(totalwidth / divisions) + (showcover_resize[0]) + 50
+    remainingHeight = image_stuff.itemsheight(renderitems) * divisions + (GAP_vertical * divisions-1)
+    screensize = (screensize[0] - 30, screensize[1] - 30)
+    while((remainingwidth < screensize[0]) and (remainingHeight < screensize[1])):
+        showcover_resize_float = (showcover_resize_float[0] * 1.01, showcover_resize_float[1] * 1.01)
+        showcover_resize = (int(showcover_resize_float[0]), int(showcover_resize_float[1]))
+        renderitems = buildRenderItems(showcover_resize)
+        totalwidth = image_stuff.itemswidth(renderitems, GAP_horizontal)
+        remainingwidth = int(totalwidth / divisions) + (showcover_resize[0]) + 50
+        remainingHeight = image_stuff.itemsheight(renderitems) * divisions + (GAP_vertical * divisions-1)
+
+    while(remainingwidth > screensize[0]):
+        showcover_resize_float = (showcover_resize_float[0] * .99, showcover_resize_float[1] * .99)
+        showcover_resize = (int(showcover_resize_float[0]), int(showcover_resize_float[1]))
+        renderitems = buildRenderItems(showcover_resize)
+        totalwidth = image_stuff.itemswidth(renderitems, GAP_horizontal)
+        remainingwidth = int(totalwidth / divisions) + (showcover_resize[0]) + 50
+
+    while(remainingHeight > screensize[1]):
+        showcover_resize_float = (showcover_resize_float[0] * .999, showcover_resize_float[1] * .999)
+        showcover_resize = (int(showcover_resize_float[0]), int(showcover_resize_float[1]))
+        renderitems = buildRenderItems(showcover_resize)
+        remainingHeight = image_stuff.itemsheight(renderitems) * divisions + (GAP_vertical * divisions-1)
+
+    return renderitems
+
+
+renderitems = findSizeandBuildRender()
+screensize = (screensize[0] + 30, screensize[1] + 30)
 # split into rows
 rows = []
 if len(renderitems) > 0:
     numberOfRowsThresholds.sort(key=lambda pair: pair[0])
     divisions = list(filter((lambda pair: len(functools.reduce(lambda x, y: x + y, show_by_day.values())) >= pair[0]), numberOfRowsThresholds))[-1][1]
+    iItem = 0
 
     totalwidth = image_stuff.itemswidth(renderitems, GAP_horizontal)
-
-    iItem = 0
     remainingwidth = int(totalwidth / divisions)
+
     for iRow in range(divisions - 1):
         row = []
         while True:

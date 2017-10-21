@@ -1,4 +1,5 @@
 # MAL-Projects
+
 Just some basic python applications I wrote for fun.
 
 Background.py - Generates a Wallpaper from the airing shows on your currently watching shows. Currently no algorithm for number of divisions. --username to give username or answer the prompt. If the prompt is blank it defaults to config username
@@ -19,10 +20,19 @@ manga_list.py - creates a mangaList.txt which is your Manga list seperated by ty
 
 cur_no_air.py - creates a list of your watching anime without the currently airing show
 
-# Config
+# Setup
+
+Requires Python3
+
 In order for you to use any of these files you must create a config.json with this info inside
 
 {
     "UserName": "YOUR_USERNAME",
     "Password": "YOUR_Password"
 }
+
+Run "pip install -r requirements.txt"
+
+Run "python idMemoizer.py"
+
+

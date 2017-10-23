@@ -49,7 +49,7 @@ class Picture(RenderItem):
 class ResizePicture(Picture):
     def __init__(self, image, newsize):
         Picture.__init__(self, image)
-        self.image = self.image.resize(newsize,resample=Image.LANCZOS)
+        self.image = self.image.resize(newsize, resample=Image.LANCZOS)
 
 
 class Label(Picture):

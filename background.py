@@ -192,7 +192,7 @@ GAP_horizontal = 10
 GAP_vertical = 15
 
 showcover_resize = (225, 332)  # Set to None to disable resizing, set to (width, height) to resize all covers to that size
-numberOfRowsThresholds = [(0, 1), (5, 2), (9, 3),(22, 4)]  # Tuples of (threshold-number-of-shows, corresponding-number-of-generated-rows)
+numberOfRowsThresholds = [(0, 1), (5, 2), (9, 3), (22, 4)]  # Tuples of (threshold-number-of-shows, corresponding-number-of-generated-rows)
 if(screensize[0] < screensize[1]):
     numberOfRowsThresholds = [(0, 1), (5, 4), (9, 6)]
 # create image_stuff.Label-picture image_stuff.Bindings
@@ -237,11 +237,11 @@ def findSizeandBuildRender():
     divisions = list(filter((lambda pair: len(functools.reduce(lambda x, y: x + y, show_by_day.values())) >= pair[0]), numberOfRowsThresholds))[-1][1]
     global showcover_resize
     global screensize
-    showcover_resize_float=showcover_resize
+    showcover_resize_float = showcover_resize
     renderitems = buildRenderItems(showcover_resize)
     totalwidth = image_stuff.itemswidth(renderitems, GAP_horizontal)
     remainingwidth = int(totalwidth / divisions) + (showcover_resize[0]) + 50
-    remainingHeight = image_stuff.itemsheight(renderitems) * divisions + (GAP_vertical * divisions-1)
+    remainingHeight = image_stuff.itemsheight(renderitems) * divisions + (GAP_vertical * divisions - 1)
     screensize = (screensize[0] - 30, screensize[1] - 30)
     while((remainingwidth < screensize[0]) and (remainingHeight < screensize[1])):
         showcover_resize_float = (showcover_resize_float[0] * 1.01, showcover_resize_float[1] * 1.01)
@@ -249,7 +249,7 @@ def findSizeandBuildRender():
         renderitems = buildRenderItems(showcover_resize)
         totalwidth = image_stuff.itemswidth(renderitems, GAP_horizontal)
         remainingwidth = int(totalwidth / divisions) + (showcover_resize[0]) + 50
-        remainingHeight = image_stuff.itemsheight(renderitems) * divisions + (GAP_vertical * divisions-1)
+        remainingHeight = image_stuff.itemsheight(renderitems) * divisions + (GAP_vertical * divisions - 1)
 
     while(remainingwidth > screensize[0]):
         showcover_resize_float = (showcover_resize_float[0] * .99, showcover_resize_float[1] * .99)
@@ -262,7 +262,7 @@ def findSizeandBuildRender():
         showcover_resize_float = (showcover_resize_float[0] * .999, showcover_resize_float[1] * .999)
         showcover_resize = (int(showcover_resize_float[0]), int(showcover_resize_float[1]))
         renderitems = buildRenderItems(showcover_resize)
-        remainingHeight = image_stuff.itemsheight(renderitems) * divisions + (GAP_vertical * divisions-1)
+        remainingHeight = image_stuff.itemsheight(renderitems) * divisions + (GAP_vertical * divisions - 1)
 
     return renderitems
 

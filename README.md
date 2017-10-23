@@ -1,15 +1,16 @@
 # MAL-Projects
+
 Just some basic python applications I wrote for fun.
 
-Background.py - Generates a Wallpaper from the airing shows on your currently watching shows. Currently no algorithm for number of divisions. --username to give username or answer the prompt. If the prompt is blank it defaults to config username
+Background.py - Generates a Wallpaper from the airing shows on your currently watching list. Currently no algorithm for number of divisions. --username to give username or answer the prompt. If the prompt is blank it defaults to config username. --old will make it  generate a Wallpaper from the non-airing shows on your currently watching list.
 
-Broken.json - Mal.py uses the tvdb to get show airing info. Some of these shows are broken and this file contains the correct info
+Broken.json - Mal.py uses the tvdb to get show airing info. Some of these shows are broken and this file contains the correct info. You may need to update this.
 
 idMemoizer.py - Mal's api can be kind of slow some times. This file will take your account and cache the object from all of your shows.
 
 image_stuff.py - Helper file for Background.py
 
-Mal.py - Needs to be renamed. What it currently does is gives you a countdown till all the shows on your currently watching and are airing air for that week.
+Mal.py - Needs to be renamed. What it currently does is gives you a countdown until all the shows on your currently watching list that are airing.
 
 covers\ - location of the pictures needed by Background.py and where it will save the title art for shows.
 
@@ -19,10 +20,19 @@ manga_list.py - creates a mangaList.txt which is your Manga list seperated by ty
 
 cur_no_air.py - creates a list of your watching anime without the currently airing show
 
-# Config
+# Setup
+
+Requires Python3
+
 In order for you to use any of these files you must create a config.json with this info inside
 
 {
     "UserName": "YOUR_USERNAME",
     "Password": "YOUR_Password"
 }
+
+Run "pip install -r requirements.txt"
+
+Run "python idMemoizer.py"
+
+

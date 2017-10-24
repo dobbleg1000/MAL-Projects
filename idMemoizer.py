@@ -17,6 +17,7 @@ def catch_exception(f):
             try:
                 return f(*args, **kwargs)
             except Exception as e:
+                #TODO: jake don't be this lazy
                 time.sleep(5)
             count += 1
         print("\n" + id + "\n")

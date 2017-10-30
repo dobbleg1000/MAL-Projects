@@ -4,7 +4,7 @@ import sys
 import json
 import os
 import progressbar
-import lagents
+import libagents
 import functools
 import time
 
@@ -42,7 +42,7 @@ def scrapeId(id):
         memoizedIDs[id] = nameInfo
 
 
-scraper = lagents.Agent(method=scrapeId, max_workers=20)
+scraper = libagents.Agent(method=scrapeId, max_workers=20)
 
 
 def progressbar_maker():

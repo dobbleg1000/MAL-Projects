@@ -3,7 +3,7 @@ import spice_api as spice
 import os
 from collections import defaultdict
 import json
-import lagents
+import libagents
 
 import functools
 
@@ -41,7 +41,7 @@ def scrapeInfo(showId, creds):
 
 
 if __name__ == "__main__":
-    agent = lagents.Agent(method=scrapeInfo, max_workers=20)
+    agent = libagents.Agent(method=scrapeInfo, max_workers=20)
     your_list = spice.get_list(spice.get_medium('manga'), creds[0], creds)
     ids = your_list.get_ids()
     ids2 = your_list.get_status(2)

@@ -4,3 +4,4 @@ test.py
 __pycache__/*
 animeList.txt
 mangaList.txt
+.idea

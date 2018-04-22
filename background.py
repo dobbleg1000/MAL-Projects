@@ -97,7 +97,8 @@ def scrapeInfo(showId, creds):
         print(nameInfo.title + " " + nameInfo.status)
     if ('Currently Airing' == nameInfo.status and current):
         name = re.sub(r'\([^)]*\)', '', nameInfo.title)
-
+        name = name.replace("△","")
+        print(name)
         if(name in broken):
             airDay = broken[name][0]
             airDay = timeAdjust(broken[name][1], airDay)
@@ -340,3 +341,5 @@ if(current):
     image.save(path + "/CurrentlyAiring.jpg")
 else:
     image.save(path + "/Watching.jpg")
+
+

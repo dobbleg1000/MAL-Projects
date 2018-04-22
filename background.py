@@ -10,7 +10,7 @@ import os
 import requests
 import image_stuff
 import functools
-import lagents
+import libagents
 import string
 
 path = os.path.dirname(os.path.abspath(__file__))
@@ -155,7 +155,7 @@ def download_images(list):
 
 your_list = spice.get_list(spice.get_medium('anime'), username, creds)
 ids = your_list.get_status(1)
-agent = lagents.Agent(method=scrapeInfo, max_workers=20)
+agent = libagents.Agent(method=scrapeInfo, max_workers=20)
 
 
 for id in ids:

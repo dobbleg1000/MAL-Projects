@@ -4,7 +4,7 @@ import sys
 import json
 import os
 import progressbar
-import lagents
+import libagents
 import functools
 import time
 
@@ -17,6 +17,7 @@ def catch_exception(f):
             try:
                 return f(*args, **kwargs)
             except Exception as e:
+                #TODO: jake don't be this lazy
                 time.sleep(5)
             count += 1
         print("\n" + id + "\n")
@@ -41,7 +42,7 @@ def scrapeId(id):
         memoizedIDs[id] = nameInfo
 
 
-scraper = lagents.Agent(method=scrapeId, max_workers=20)
+scraper = libagents.Agent(method=scrapeId, max_workers=20)
 
 
 def progressbar_maker():

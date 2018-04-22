@@ -8,7 +8,7 @@ import pytz
 import tkinter as tk
 import json
 import pickle
-import lagents
+import libagents
 
 exitFlag = 0
 
@@ -106,7 +106,7 @@ class mal_app(tk.Tk):
         self.list = tk.Label(self, text="", fg="white", bg="black")
         self.list.pack()
         self.label = ""
-        self.agent = lagents.Agent(method=scrapeInfo)
+        self.agent = libagents.Agent(method=scrapeInfo)
 
         self.update_label()
 

@@ -53,5 +53,5 @@ if __name__ == "__main__":
         animeList[key].sort()
         final += "\n\n" + key + "\n" + "\n".join(animeList[key])
 
-    thefile = open(path + '/animeList.txt', 'w')
+    thefile = open(path + '/animeList.txt', 'w', encoding='utf8')
     thefile.write(final[2:])

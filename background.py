@@ -98,7 +98,6 @@ def scrapeInfo(showId, creds):
     if ('Currently Airing' == nameInfo.status and current):
         name = re.sub(r'\([^)]*\)', '', nameInfo.title)
         name = name.replace("△","")
-        print(name)
         if(name in broken):
             airDay = broken[name][0]
             airDay = timeAdjust(broken[name][1], airDay)
@@ -111,7 +110,8 @@ def scrapeInfo(showId, creds):
                 airDay = timeAdjust(timeOfDay, airDay)
                 memoizedAir[name] = airDay
             except Exception:
-                print(name)
+                print(name," NO TVDB")
+                return
 
         Show_List.append((airDay, name, nameInfo.image_url))
     elif('Currently Airing' != nameInfo.status and not current):
@@ -139,6 +139,8 @@ def download_images(list):
             if not os.path.exists(directory):
                 os.makedirs(directory)
             image = show[2]
+            if os.path.isfile(file_path):
+                continue
             try:
                 response = requests.get(image, stream=True)
                 with open(file_path, 'wb') as img:
@@ -193,8 +195,8 @@ GAP_horizontal = 10
 GAP_vertical = 15
 
 showcover_resize = (225, 332)  # Set to None to disable resizing, set to (width, height) to resize all covers to that size
-numberOfRowsThresholds = [(0, 1), (5, 2), (9, 3), (22, 4)]  # Tuples of (threshold-number-of-shows, corresponding-number-of-generated-rows)
-if(screensize[0] < screensize[1]):
+numberOfRowsThresholds = [(0, 1), (5, 2), (9, 3), (22, 4), (32, 5)]  # Tuples of (threshold-number-of-shows, corresponding-number-of-generated-rows)
+if screensize[0] < screensize[1]:
     numberOfRowsThresholds = [(0, 1), (5, 4), (9, 6)]
 # create image_stuff.Label-picture image_stuff.Bindings
 
